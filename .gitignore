@@ -1,0 +1,5 @@
+.idea/
+__pycache__
+*.egg-info
+config.toml
+.mypy_cache/

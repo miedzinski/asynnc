@@ -1,0 +1,35 @@
+host = "irc.freenode.net"
+port = 6697
+ssl = true
+encoding = "utf-8"
+reconnection_interval = 60
+
+nick = "asynnc"
+
+cmd_trigger = '!'
+
+channels = ["#nnc"]
+
+[db]
+name = "db_name"
+user = "user"
+host = "127.0.0.1"
+port = 5432
+password = "password"
+
+[logging]
+version = 1
+
+[logging.formatters.simple]
+format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+[logging.handlers.console]
+class = "logging.StreamHandler"
+level = "INFO"
+stream = "ext://sys.stdout"
+formatter = "simple"
+
+[logging.loggers."nnc.core.protocol"]
+level = "INFO"
+handlers = ["console"]
+
