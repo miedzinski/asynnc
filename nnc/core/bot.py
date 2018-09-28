@@ -38,6 +38,7 @@ class Bot:
             user=config.db.user,
             host=config.db.host,
             port=config.db.port,
+            password=config.db.password,
         )
         db.set_allow_sync(False)
         BaseModel._meta.database = db
