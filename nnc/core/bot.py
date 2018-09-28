@@ -43,6 +43,8 @@ class Bot:
         BaseModel._meta.database = db
         self.objects = peewee_async.Manager(db)
 
+        self.channels = collections.defaultdict(set)
+
     def send_raw(self, msg):
         self.protocol.write(msg)
 
@@ -128,3 +130,44 @@ def join_channels(bot, msg):
 @irc(numeric='ERR_NICKNAMEINUSE')
 def nickname_in_use(bot, msg):
     bot.set_nick(bot.nick + '_')
+
+
+@irc(numeric='RPL_NAMREPLY')
+def on_namreply(bot, msg):
+    users = msg.params[-1].split()
+    channel = msg.params[2]
+    bot.channels[channel] = set(users)
+
+
+@irc(cmd='JOIN')
+def on_join(bot, msg):
+    bot.channels[msg.channel].add(msg.nick)
+
+
+@irc(cmd='KICK')
+def on_kick(bot, msg):
+    kicked_user = msg.params[-1]
+    bot.channels[msg.channel].discard(kicked_user)
+    if msg.nick == bot.nick:
+        del bot.channels[msg.channel]
+
+
+@irc(cmd='QUIT')
+@irc(cmd='PART')
+def on_part(bot, msg):
+    bot.channels[msg.channel].discard(msg.nick)
+    if msg.nick == bot.nick:
+        del bot.channels[msg.channel]
+
+
+@irc(cmd='NICK')
+def on_nickname_change(bot, msg):
+    old_nick = msg.nick
+    new_nick = msg.params[-1]
+
+    if old_nick == bot.nick:
+        bot.nick = new_nick
+    for channel in bot.channels:
+        if old_nick in bot.channels[channel]:
+            bot.channels[channel].discard(old_nick)
+            bot.channels[channel].add(new_nick)
