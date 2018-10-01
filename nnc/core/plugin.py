@@ -4,9 +4,7 @@ import importlib
 import pkgutil
 import re
 
-import typing as t
-
-CMD_HANDLERS: t.Dict[str, t.Dict[str, t.Callable]] = collections.defaultdict(dict)
+CMD_HANDLERS = collections.defaultdict(dict)
 RE_HANDLERS = collections.defaultdict(lambda: collections.defaultdict(list))
 
 
